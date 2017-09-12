@@ -156,14 +156,8 @@
 
 		$(function(){
 			var stage = new createjs.Stage("messagePane");
-			generateCells(stage, [
-				['ytd', 'enr', 'tgr', ' ud', 'wrd', 'hal', 'a l', 't"l', ' sl'],
-				['ird', 'siu', ' ad', 'all', 'ned', 'yhd', ' tl', 'oul', 'cnu'],
-				['eud', 'asu', 'nrr', ' .d', 'b d', 'usr', 't.c', ' ru', 'aou'],
-				[' td', 'm u', 'utd', 'lil', 'tmr', 'iir', 'tsr', 'utu', 'diu'],
-				['ehd', ' su', 'osr', 'f r', ' "r', 'dvr', 'rer', 'orr', 'psu'],
-				['s r', '?iu']
-			])
+			// no cheating!
+			generateCells(stage, JSON.parse(window.atob("W1sieXRkIiwiZW5yIiwidGdyIiwiIHVkIiwid3JkIiwiaGFsIiwiYSBsIiwidFwibCIsIiBzbCJdLFsiaXJkIiwic2l1IiwiIGFkIiwiYWxsIiwibmVkIiwieWhkIiwiIHRsIiwib3VsIiwiY251Il0sWyJldWQiLCJhc3UiLCJucnIiLCIgLmQiLCJiIGQiLCJ1c3IiLCJ0LmMiLCIgcnUiLCJhb3UiXSxbIiB0ZCIsIm0gdSIsInV0ZCIsImxpbCIsInRtciIsImlpciIsInRzciIsInV0dSIsImRpdSJdLFsiZWhkIiwiIHN1Iiwib3NyIiwiZiByIiwiIFwiciIsImR2ciIsInJlciIsIm9yciIsInBzdSJdLFsicyByIiwiP2l1Il1d")))
 			stage.update();
 		});
 	</script>
