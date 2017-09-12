@@ -1,0 +1,174 @@
+<html>
+<head>
+	<script type="text/javascript" src="jquery-3.2.1.js"></script>
+	<script type="text/javascript" src="createjs.js"></script>
+	<script type="text/javascript">
+
+		function Cell(la, lb, sideLength) {
+			this.la = la;
+			this.lb = lb;
+			this.sideLength = sideLength;
+			this.draw = function(stage, startX, startY, arrowDir) {
+				var cell = new createjs.Shape();
+				cell.graphics.setStrokeStyle(2);
+				cell.graphics.beginStroke("black");
+				cell.graphics.drawRect(startX, startY, this.sideLength, this.sideLength);
+				
+
+				var innerCell = new createjs.Shape();
+				innerCell.graphics.setStrokeStyle(2);
+				innerCell.graphics.beginStroke("black");
+				var aIndx = charIndex(this.la);
+
+				var aLines = new createjs.Shape();
+				aLines.graphics.setStrokeStyle(3);
+				aLines.graphics.beginStroke("blue");
+
+				var aIndexKey = [
+					[startX, startY, startX + this.sideLength/3, startY + this.sideLength/3],
+					[startX + 2*this.sideLength/3, startY + this.sideLength/3, startX+this.sideLength, startY],
+					[startX + this.sideLength/3, startY + 2*this.sideLength/3, startX, startY + this.sideLength],
+					[startX + 2*this.sideLength/3, startY + 2*this.sideLength/3, startX + this.sideLength, startY + this.sideLength]
+				];
+
+				for (var i = 0; i < 6; i++) {
+					var bit = aIndx & 1;
+					if (bit > 0) {
+						if (i < 4) {
+							var lineIndex = aIndexKey[i];
+							aLines.graphics.moveTo(lineIndex[0], lineIndex[1]);
+							aLines.graphics.lineTo(lineIndex[2], lineIndex[3]);
+						} else {
+							innerCell.graphics.beginFill("blue");
+						}
+					}
+					aIndx = aIndx >> 1;
+				}
+
+				var arrowCell = new createjs.Shape();
+				arrowCell.graphics.setStrokeStyle(2);
+				arrowCell.graphics.beginStroke("black");
+
+				var bLines = new createjs.Shape();
+				bLines.graphics.beginStroke("purple");
+				bLines.graphics.setStrokeStyle(3);
+
+				var bIndx = charIndex(this.lb);
+
+				var bIndexKey = [
+					[startX, startY + this.sideLength/2, startX + this.sideLength/2, startY],
+					[startX + this.sideLength/2, startY, startX + this.sideLength, startY + this.sideLength/2],
+					[startX, startY + this.sideLength/2, startX + this.sideLength/2, startY + this.sideLength],
+					[startX + this.sideLength/2, startY + this.sideLength, startX + this.sideLength, startY + this.sideLength/2]
+				];
+
+				var arrowIndex = {
+					"u": [
+						[startX + this.sideLength/2, startY],
+						[startX + 2*this.sideLength/3, startY + this.sideLength/3],
+						[startX + this.sideLength/3, startY + this.sideLength/3]
+					],
+					"l": [
+						[startX + this.sideLength/3, startY + this.sideLength/3],
+						[startX, startY + this.sideLength/2],
+						[startX + this.sideLength/3, startY + 2*this.sideLength/3]
+					],
+					"d": [
+						[startX + this.sideLength/3, startY + 2*this.sideLength/3],
+						[startX + 2*this.sideLength/3, startY + 2*this.sideLength/3],
+						[startX + this.sideLength/2, startY + this.sideLength]
+					],
+					"r": [
+						[startX + 2*this.sideLength/3, startY + this.sideLength/3],
+						[startX + this.sideLength, startY + this.sideLength/2],
+						[startX + 2*this.sideLength/3, startY + 2*this.sideLength/3]
+					]
+				};
+
+				for (var i = 0; i < 6; i++) {
+					var bit = bIndx & 1;
+					if (bit > 0) {
+						if (i < 4) {
+							var lineIndex = bIndexKey[i];
+							bLines.graphics.moveTo(lineIndex[0], lineIndex[1]);
+							bLines.graphics.lineTo(lineIndex[2], lineIndex[3]);
+						} else {
+							arrowCell.graphics.beginFill("purple");
+						}
+					}
+					bIndx = bIndx >> 1;
+				}
+
+				if (arrowDir != "c") {
+					var arrowDirValues = arrowIndex[arrowDir];
+					arrowCell.graphics.moveTo(arrowDirValues[0][0], arrowDirValues[0][1]);
+					arrowCell.graphics.lineTo(arrowDirValues[1][0], arrowDirValues[1][1]);
+					arrowCell.graphics.lineTo(arrowDirValues[2][0], arrowDirValues[2][1]);
+					arrowCell.graphics.closePath();
+				} else {
+					arrowCell.graphics.drawCircle(startX + this.sideLength/2, startY + this.sideLength/2, this.sideLength/3)
+				}
+				
+				innerCell.graphics.drawRect(startX + this.sideLength/3, 
+					startY + this.sideLength/3,
+					this.sideLength/3,
+					this.sideLength/3);
+
+				stage.addChild(aLines);
+				stage.addChild(bLines);
+				stage.addChild(arrowCell);
+				stage.addChild(innerCell);
+				stage.addChild(cell);
+
+			};
+		}
+
+		function charIndex(char) {
+			if (char == ' ') {
+				return 0;
+			}
+			if (char == '?') {
+				return 31;
+			}
+			if (char == '.') {
+				return 27;
+			}
+			if (char == '"') {
+				return 28;
+			}
+			return (char.charCodeAt(0)) - ('a'.charCodeAt(0)) + 1;
+		}
+
+		function generateCells(stage, cellMatrix) {
+			var width = 120;
+			var topX = 10;
+			var topY = 10;
+
+			for (var i = 0; i < cellMatrix.length; i++) {
+				for (var j = 0; j < cellMatrix[i].length; j++) {
+					var fill = cellMatrix[i][j];
+
+					var cell = new Cell(fill.substring(0, 1), fill.substring(1,2), width);
+					cell.draw(stage, topX + width*j, topY + width*i, fill.substring(2,3));
+				}
+			}
+		}
+
+		$(function(){
+			var stage = new createjs.Stage("messagePane");
+			generateCells(stage, [
+				['ytd', 'enr', 'tgr', ' ud', 'wrd', 'hal', 'a l', 't"l', ' sl'],
+				['ird', 'siu', ' ad', 'all', 'ned', 'yhd', ' tl', 'oul', 'cnu'],
+				['eud', 'asu', 'nrr', ' .d', 'b d', 'usr', 't.c', ' ru', 'aou'],
+				[' td', 'm u', 'utd', 'lil', 'tmr', 'iir', 'tsr', 'utu', 'diu'],
+				['ehd', ' su', 'osr', 'f r', ' "r', 'dvr', 'rer', 'orr', 'psu'],
+				['s r', '?iu']
+			])
+			stage.update();
+		});
+	</script>
+</head>
+<body>
+	<canvas id="messagePane" width="1300" height="760"></canvas>
+</body>
+</html>
